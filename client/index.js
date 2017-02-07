@@ -16,7 +16,6 @@ callback = function (response) {
 
     response.on('end', function () {
         performOperation(str);
-        processRequest();
     });
 }
 
@@ -46,8 +45,11 @@ function performOperation(str) {
 
     var req = http.request(postOptions, function (res) {
         res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+        });
         res.on('end', function () {
             console.log('Response: Done');
+            processRequest();
         });
     });
     req.write(data);

@@ -60,6 +60,7 @@ function setUpHttpHandler() {
         var queue = findElement(raspId);
         queue.operation.shift();
         sb.publish(operation);
+        console.log("progress update");
         res.json({ 'status': 'success' });
     });
 
