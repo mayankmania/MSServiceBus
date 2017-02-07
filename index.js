@@ -42,12 +42,11 @@ function setUpHttpHandler() {
 
     app.use('/getCommand', function (req, res) {
         var queue = findElement(raspId);
-        console.log(queue);
-        if (queue.operation.length == 0) {
+        console.log(queue.operation.length);
+        if (queue.operation.length <= 0) {
             sb.subscribe(raspId, function () {
                 res.json(queue.operation[0]);
             });
-            console.log("Client subscribe");
         }
         else {
             res.json(queue.operation[0]);
@@ -75,27 +74,26 @@ function setUpHttpHandler() {
         var status = req.body.status;
         var operation = raspId + req.body.deviceId + req.body.operation;
         var queue = findElement(raspId);
-        queue.operation.pop();
-        console.log(queue.operation);
+        queue.operation.shift();
         sb.publish(operation, status);
-        res.json({'status':'success'});
+        res.json({ 'status': 'success' });
     });
 
     app.use('/getDevices', function (req, res) {
         var queue = findElement(raspId);
-        console.log(queue.operation.length);
         if (queue.operation.length == 0) {
-            queue.operation.push({ operation: { description: "get", deviceId: 0 } });
+            queue.operation.push({ description: "get", deviceId: 0 });
             sb.publish(raspId);
             console.log("Server publish");
         }
         else {
-            queue.operation.push({ operation: { description: "get", deviceId: 0 } });
+            if (!isDuplicateOperation(raspId, 0, "get")) {
+                queue.operation.push({ description: "get", deviceId: 0 });
+            }
         }
         sb.subscribe(raspId + "0" + "get", function () {
-            res.json({'status':'success'});
+            res.json({ 'status': 'success' });
         });
-
     });
 
     function findElement(raspId) {
@@ -106,5 +104,16 @@ function setUpHttpHandler() {
         }
         myQueue.push({ raspId: raspId, operation: [] });
         return myQueue[0];
+    }
+
+    function isDuplicateOperation(raspId, deviceId, description) {
+        var rasp = findElement(raspId);
+        var operations = rasp.operation;
+        for (var i = 0; i < operations.length; i++) {
+            if (operations[i].deviceId == deviceId && operations[i].description == description) {
+                return true;
+            }
+        }
+        return false;
     }
 }
