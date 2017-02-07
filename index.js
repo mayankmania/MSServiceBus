@@ -31,7 +31,7 @@ function configureExternalModule() {
     app.use(bodyParser.json());
 
     var options = {
-        index: "index.htm"
+        index: "index.html"
     };
 
     app.use('/', express.static('public', options));
@@ -44,9 +44,10 @@ function setUpHttpHandler() {
         var queue = findElement(raspId);
         console.log(queue);
         if (queue.operation.length == 0) {
-            sb.subscribe(raspId, data, function () {
+            sb.subscribe(raspId, function () {
                 res.json(queue.operation[0]);
             });
+            console.log("Client subscribe");
         }
         else {
             res.json(queue.operation[0]);
@@ -81,9 +82,11 @@ function setUpHttpHandler() {
 
     app.use('/getDevices', function (req, res) {
         var queue = findElement(raspId);
+        console.log(queue.operation.length);
         if (queue.operation.length == 0) {
             queue.operation.push({ operation: { description: "get", deviceId: 0 } });
             sb.publish(raspId);
+            console.log("Server publish");
         }
         else {
             queue.operation.push({ operation: { description: "get", deviceId: 0 } });
