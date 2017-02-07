@@ -48,7 +48,6 @@ function performOperation(str) {
         res.on('data', function (chunk) {
         });
         res.on('end', function () {
-            console.log('Response: Done');
             processRequest();
         });
     });

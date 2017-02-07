@@ -55,11 +55,12 @@ function setUpHttpHandler() {
     app.post('/updateProgress', function (req, res) {
         var deviceId = req.body.deviceId;
         var status = req.body.status;
+        console.log(deviceId);
         var operation = raspId + req.body.deviceId + req.body.description;
-        console.log("Client : " + operation);
         var queue = findElement(raspId);
         queue.operation.shift();
         sb.publish(operation);
+        console.log(operation);
         console.log("progress update");
         res.json({ 'status': 'success' });
     });
@@ -86,12 +87,12 @@ function setUpHttpHandler() {
     app.use('/getDevices', function (req, res) {
         var queue = findElement(raspId);
         if (queue.operation.length == 0) {
-            queue.operation.push({ description: "get", deviceId: 0 });
+            queue.operation.push({ description: "get", deviceId: "0" });
             sb.publish(raspId);
         }
         else {
             if (!isDuplicateOperation(raspId, 0, "get")) {
-                queue.operation.push({ description: "get", deviceId: 0 });
+                queue.operation.push({ description: "get", deviceId: "0" });
             }
         }
         sb.subscribe(raspId + "0" + "get", function () {
