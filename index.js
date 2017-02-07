@@ -42,7 +42,6 @@ function setUpHttpHandler() {
 
     app.use('/getCommand', function (req, res) {
         var queue = findElement(raspId);
-        console.log(queue.operation.length);
         if (queue.operation.length <= 0) {
             sb.subscribe(raspId, function () {
                 res.json(queue.operation[0]);
@@ -53,30 +52,34 @@ function setUpHttpHandler() {
         }
     });
 
-    app.post('/performOperation', function (req, res) {
-        var deviceId = req.body.deviceId;
-        var queue = findElement(raspId);
-        if (queue.operation.length == 0) {
-            queue.operation.push({ operation: { description: "post", deviceId: deviceId } });
-            sb.publish(raspId);
-        }
-        else {
-            queue.operation.push({ operation: { description: "post", deviceId: deviceId } });
-        }
-        var operation = raspId + req.body.deviceId + req.body.operation;
-        sb.subscribe(operation, function () {
-            res.json({ 'status': 'success' });
-        });
-    });
-
     app.post('/updateProgress', function (req, res) {
         var deviceId = req.body.deviceId;
         var status = req.body.status;
-        var operation = raspId + req.body.deviceId + req.body.operation;
+        var operation = raspId + req.body.deviceId + req.body.description;
+        console.log("Client : " + operation);
         var queue = findElement(raspId);
         queue.operation.shift();
-        sb.publish(operation, status);
+        sb.publish(operation);
         res.json({ 'status': 'success' });
+    });
+
+    app.post('/performOperation', function (req, res) {
+        var data = req.body;
+        var deviceId = data.deviceId;
+        var queue = findElement(raspId);
+        if (queue.operation.length == 0) {
+            queue.operation.push({ description: "post", deviceId: deviceId });
+            sb.publish(raspId);
+        }
+        else if (!isDuplicateOperation(raspId, deviceId, "post")) {
+            queue.operation.push({ description: "post", deviceId: deviceId });
+        }
+
+        var operation = raspId + req.body.deviceId + req.body.description;
+        console.log("Server : " + operation);
+        sb.subscribe(operation, function () {
+            res.json({ 'status': 'success' });
+        });
     });
 
     app.use('/getDevices', function (req, res) {
@@ -84,7 +87,6 @@ function setUpHttpHandler() {
         if (queue.operation.length == 0) {
             queue.operation.push({ description: "get", deviceId: 0 });
             sb.publish(raspId);
-            console.log("Server publish");
         }
         else {
             if (!isDuplicateOperation(raspId, 0, "get")) {

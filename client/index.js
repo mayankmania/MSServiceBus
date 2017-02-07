@@ -15,18 +15,19 @@ callback = function (response) {
     });
 
     response.on('end', function () {
-        doSomeWork();
-        var req = http.request(getOptions, callback);
-        req.end();
+        performOperation(str);
+        processRequest();
     });
 }
 
 processRequest();
 
-function doSomeWork() {
-    var post_data = JSON.stringify({
-        'deviceId': '0',
-        'operation': 'get',
+function performOperation(str) {
+    var operation = JSON.parse(str);
+
+    var data = JSON.stringify({
+        'deviceId': operation.deviceId,
+        'description': operation.description,
         'status': 'success'
     });
 
@@ -39,20 +40,18 @@ function doSomeWork() {
         //This is the only line that is new. `headers` is an object with the headers to request
         headers: {
             'Content-Type': 'application/json',
-            "Content-Length": Buffer.byteLength(post_data)
+            "Content-Length": Buffer.byteLength(data)
         }
     };
 
-    var post_req = http.request(postOptions, function (res) {
+    var req = http.request(postOptions, function (res) {
         res.setEncoding('utf8');
         res.on('end', function () {
             console.log('Response: Done');
         });
     });
-
-    // post the data
-    post_req.write(post_data);
-    post_req.end();
+    req.write(data);
+    req.end();
 }
 
 function processRequest() {
