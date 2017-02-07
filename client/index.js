@@ -1,9 +1,11 @@
 var http = require('http');
 
+var host = "rpiservice.azurewebsites.net"
+
 var getOptions = {
-    host: 'localhost',
+    host: host,
     path: '/getCommand',
-    port: '9000',
+    //port: '9000',
     //This is the only line that is new. `headers` is an object with the headers to request
     headers: { 'raspId': '1' }
 };
@@ -31,11 +33,11 @@ function performOperation(str) {
     });
 
     var postOptions = {
-        host: 'localhost',
+        host: host,
         path: '/updateProgress',
         method: "POST",
         json: true,
-        port: '9000',
+      //  port: '9000',
         //This is the only line that is new. `headers` is an object with the headers to request
         headers: {
             'Content-Type': 'application/json',
