@@ -75,7 +75,8 @@ function setUpHttpHandler() {
         var status = req.body.status;
         var operation = raspId + req.body.deviceId + req.body.operation;
         var queue = findElement(raspId);
-        queue.operation = queue.operation.pop();
+        queue.operation.pop();
+        console.log(queue.operation);
         sb.publish(operation, status);
         res.json({'status':'success'});
     });
