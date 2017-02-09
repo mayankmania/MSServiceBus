@@ -17,8 +17,6 @@
   },
   "homepage": "https://github.com/mayankmania/MSServiceBus#readme",
   "dependencies": {
-    "express":"^4.14.1",
-    "body-parser": "^1.16.0",
-    "events": "^1.1.1"
+    "ms-gpio" : "3.0.0"
   }
 }
