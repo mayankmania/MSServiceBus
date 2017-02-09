@@ -1,6 +1,6 @@
 var http = require('http');
 var gpio = require('ms-gpio');
-var host = "localhost";
+var host = "192.168.0.4";
 
 
 var getOptions = {
