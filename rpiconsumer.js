@@ -1,12 +1,12 @@
 var http = require('http');
 var gpio = require('ms-gpio');
-var host = "192.168.0.4";
+var host = "rpiservice.azurewebsites.net";
 
 
 var getOptions = {
     host: host,
     path: '/getCommand',
-    port: '9000',
+    //port: '9000',
     headers: { 'raspId': '1' }
 };
 
@@ -55,7 +55,7 @@ function performOperation(str) {
         path: '/updateProgress',
         method: "POST",
         json: true,
-        port: '9000',
+        //port: '9000',
         headers: {
             'Content-Type': 'application/json',
             "Content-Length": Buffer.byteLength(data)
